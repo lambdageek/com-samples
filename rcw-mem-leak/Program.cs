@@ -29,6 +29,8 @@ namespace FromCom
 	void CommandOne ();
 	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
 	void CommandTwo ([In] [MarshalAs(UnmanagedType.Interface)] ToCom.IBoxXYZ box);
+	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+	void Add ([In] [MarshalAs(UnmanagedType.Interface)] ToCom.IBoxXYZ box);
     }
 
     [ComImport]
@@ -40,6 +42,9 @@ namespace FromCom
 
 	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
 	public virtual extern void CommandTwo ([In] [MarshalAs(UnmanagedType.Interface)] ToCom.IBoxXYZ box);
+
+	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+	public virtual extern void Add ([In] [MarshalAs(UnmanagedType.Interface)] ToCom.IBoxXYZ box);
     }
 
     [Guid ("58228253-A9B1-4F6C-A4D2-0F997CEE74FD")]
@@ -91,6 +96,9 @@ public class Program
 	    Console.WriteLine ("Called CommandOne");
 	    x.CommandTwo (new ToCom.BoxXYZ());
 	    Console.WriteLine ("Called CommandTwo");
+	    for (int i = 0; i < 4; ++i)
+		x.Add (new ToCom.BoxXYZ());
+	    Console.WriteLine ("Added 4 Boxes to OneObject");
 	    x = null;
 
 	});

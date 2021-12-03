@@ -13,6 +13,8 @@ LIBEXT=dylib
 
 
 SOURCES= \
+	mini-container.h \
+	mini-container.c \
 	mem-leak-lib.h \
 	mem-leak-lib.c
 

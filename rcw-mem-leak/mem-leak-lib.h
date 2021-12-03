@@ -4,6 +4,8 @@
 
 #include <stdint.h>
 
+#include "mini-container.h"
+
 typedef void* gpointer;
 
 #ifndef NULL
@@ -59,6 +61,7 @@ typedef struct IOneVtbl {
 	IUnknownVtbl unk;
 	HRESULT (STDCALL *CommandOne) (IOne *pThis);
 	HRESULT (STDCALL *CommandTwo) (IOne *pThis, IBoxXYZ *pBox);
+	HRESULT (STDCALL *Add) (IOne *pThis, IBoxXYZ *pBox);
 } IOneVtbl;
 
 struct IDispatch
@@ -77,6 +80,7 @@ struct IOne {
 typedef struct OneObject {
 	IUnknown unk;
 	int refcount;
+	MiniContainer *container;
 } OneObject;
 
 API_EXPORT HRESULT STDCALL memleak_create_one_object (OneObject **out);

@@ -50,12 +50,16 @@ oneobject_CommandOne (IOne *pThis);
 static HRESULT STDCALL
 oneobject_CommandTwo (IOne *pThis, IBoxXYZ *pBox);
 
+static HRESULT STDCALL
+oneobject_Add (IOne *pThis, IBoxXYZ *pBox);
+
 static IOneVtbl oneobject_vtable = {
 	&oneobject_QueryInterface,
 	&oneobject_AddRef,
 	&oneobject_Release,
 	&oneobject_CommandOne,
 	&oneobject_CommandTwo,
+	&oneobject_Add,
 };
 
 HRESULT STDCALL
@@ -65,6 +69,7 @@ memleak_create_one_object (OneObject **out)
 	OneObject *p = marshal_alloc (sizeof (OneObject));
 	p->unk.vtbl = &oneobject_vtable.unk;
 	p->refcount = 1;
+	p->container = mini_container_new (5);
 	*out = p;
 	LOG("return");
 	return S_OK;
@@ -110,6 +115,14 @@ oneobject_AddRef (IUnknown *pUnk)
 	return S_OK;
 }
 
+static void
+item_destroy_func (void *item, void *user_data)
+{
+	IBoxXYZ *pBox = (IBoxXYZ*)item;
+	pBox->vtbl->unk.Release ((IUnknown*)pBox);
+	fprintf (stderr, "  Released Box %p\n", pBox);
+}
+
 static HRESULT STDCALL
 oneobject_Release (IUnknown *pUnk)
 {
@@ -118,6 +131,7 @@ oneobject_Release (IUnknown *pUnk)
 	obj->refcount--;
 	if (obj->refcount == 0) {
 		LOG ("free");
+		mini_container_destroy (obj->container, item_destroy_func);
 		marshal_free (obj);
 	}
 	LOG ("return");
@@ -148,5 +162,15 @@ oneobject_CommandTwo (IOne *pThis, IBoxXYZ *pBox)
 	fprintf (stderr, "  => returned %d\n", res);
 	
 	LOG ("return");
+	return S_OK;
+}
+
+static HRESULT STDCALL
+oneobject_Add (IOne *pThis, IBoxXYZ *pBox)
+{
+	OneObject *obj = (OneObject*)pThis;
+	pBox->vtbl->unk.AddRef ((IUnknown*)pBox);
+	mini_container_add (obj->container, pBox);
+	fprintf (stderr, "  Added Box %p\n", pBox);
 	return S_OK;
 }
