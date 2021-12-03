@@ -11,6 +11,8 @@ static GUID IID_IDispatch = {0x00020400, 0, 0, {0xc0,0,0,0,0,0,0,0x46}};
 static GUID IID_IOne = {0x78338C12, 0x1AB5, 0x435D, {0xBC, 0xDA, 0xA1, 0x74, 0x17, 0x49, 0x6F, 0x4A}};
 static GUID IID_OneClsId = {0x58228253, 0xA9B1, 0x4F6C, {0xA4, 0xD2, 0x0F, 0x99, 0x7C, 0xEE, 0x74, 0xFD}};
 
+static GUID IID_IBoxXYZ = {0xE6E1F38F, 0x9700, 0x473A, {0x98, 0x0C, 0xAA, 0x41, 0xB6, 0xFD, 0xE3, 0xE8}};
+
 static void*
 marshal_alloc (size_t size)
 {
@@ -43,13 +45,17 @@ static HRESULT STDCALL
 oneobject_Release (IUnknown *pUnk);
 
 static HRESULT STDCALL
-oneobject_CommandOne (void);
+oneobject_CommandOne (IOne *pThis);
+
+static HRESULT STDCALL
+oneobject_CommandTwo (IOne *pThis, IBoxXYZ *pBox);
 
 static IOneVtbl oneobject_vtable = {
 	&oneobject_QueryInterface,
 	&oneobject_AddRef,
 	&oneobject_Release,
 	&oneobject_CommandOne,
+	&oneobject_CommandTwo,
 };
 
 HRESULT STDCALL
@@ -119,9 +125,28 @@ oneobject_Release (IUnknown *pUnk)
 }
 
 static HRESULT STDCALL
-oneobject_CommandOne (void)
+oneobject_CommandOne (IOne *pThis)
 {
 	LOG ("enter");
+	fprintf (stderr, "  pThis = %p\n", (gpointer) pThis);
+	LOG ("return");
+	return S_OK;
+}
+
+static HRESULT STDCALL
+oneobject_CommandTwo (IOne *pThis, IBoxXYZ *pBox)
+{
+	LOG ("enter");
+	fprintf (stderr, "  pThis = %p, pBox = %p\n", (gpointer)pThis, (gpointer)pBox);
+	LOG ("calling ThankYou");
+	int res = -1;
+	pBox->vtbl->ThankYou (pBox, &res);
+	fprintf (stderr, "  => returned %d\n", res);
+	res = -1;
+	LOG ("calling ThankYou again");
+	pBox->vtbl->ThankYou (pBox, &res);
+	fprintf (stderr, "  => returned %d\n", res);
+	
 	LOG ("return");
 	return S_OK;
 }

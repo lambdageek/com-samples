@@ -50,9 +50,15 @@ typedef struct
 	HRESULT (STDCALL *Invoke)(IDispatch *iface, unsigned int dispid, REFIID iid, unsigned int lcid, unsigned short flags, gpointer params, gpointer result, gpointer excepinfo, gpointer err_arg);
 } IDispatchVtbl;
 
+typedef struct IOne IOne;
+
+typedef struct IBoxXYZ IBoxXYZ;
+
+
 typedef struct IOneVtbl {
 	IUnknownVtbl unk;
-	HRESULT (STDCALL *CommandOne) (void);
+	HRESULT (STDCALL *CommandOne) (IOne *pThis);
+	HRESULT (STDCALL *CommandTwo) (IOne *pThis, IBoxXYZ *pBox);
 } IOneVtbl;
 
 struct IDispatch
@@ -64,9 +70,9 @@ struct IUnknown {
 	const IUnknownVtbl *vtbl;
 };
 
-typedef struct IOne {
+struct IOne {
 	const IOneVtbl *vtbl;
-} IOne;
+};
 
 typedef struct OneObject {
 	IUnknown unk;
@@ -75,5 +81,13 @@ typedef struct OneObject {
 
 API_EXPORT HRESULT STDCALL memleak_create_one_object (OneObject **out);
 
+typedef struct IBoxXYZVtbl {
+	IUnknownVtbl unk;
+	HRESULT (STDCALL *ThankYou) (IBoxXYZ *pThis, int32_t *out);
+} IBoxXYZVtbl;
+
+struct IBoxXYZ {
+	const IBoxXYZVtbl *vtbl;
+};
 
 #endif

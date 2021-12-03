@@ -25,7 +25,10 @@ namespace FromCom
     [Guid ("78338C12-1AB5-435D-BCDA-A17417496F4A")]
     [InterfaceType (ComInterfaceType.InterfaceIsIUnknown)]
     public interface IOne {
+	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
 	void CommandOne ();
+	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+	void CommandTwo ([In] [MarshalAs(UnmanagedType.Interface)] ToCom.IBoxXYZ box);
     }
 
     [ComImport]
@@ -34,12 +37,44 @@ namespace FromCom
     public class _One : IOne {
 	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
 	public virtual extern void CommandOne ();
+
+	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType = MethodCodeType.Runtime)]
+	public virtual extern void CommandTwo ([In] [MarshalAs(UnmanagedType.Interface)] ToCom.IBoxXYZ box);
     }
 
     [Guid ("58228253-A9B1-4F6C-A4D2-0F997CEE74FD")]
     public class One : _One {
 	static One () {
 	    ExtensibleClassFactory.RegisterObjectCreationCallback (static (IntPtr aggr) => LeakLib.Create());
+	}
+    }
+}
+
+namespace ToCom {
+    [ComImport]
+    [Guid ("E6E1F38F-9700-473A-980C-AA41B6FDE3E8")]
+    [InterfaceType (ComInterfaceType.InterfaceIsIUnknown)]
+    public interface IBoxXYZ {
+	[MethodImpl (MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
+	public int ThankYou ();
+    }
+
+    public class BoxXYZ : IBoxXYZ, IDisposable {
+	int count;
+	public BoxXYZ() { }
+	public virtual int ThankYou () {
+	    ++count;
+	    Console.WriteLine ($"ThankYou called {count} times");
+	    return count;
+	}
+
+	~BoxXYZ() {
+	    Console.WriteLine ($"Finalizing BoxXYZ, count is {count}");
+	}
+
+	public void Dispose () {
+	    Console.WriteLine ("Disposing BoxXYZ");
+	    GC.SuppressFinalize (this);
 	}
     }
 }
@@ -54,6 +89,8 @@ public class Program
 	    Console.WriteLine ("Created an object");
 	    x.CommandOne ();
 	    Console.WriteLine ("Called CommandOne");
+	    x.CommandTwo (new ToCom.BoxXYZ());
+	    Console.WriteLine ("Called CommandTwo");
 	    x = null;
 
 	});
