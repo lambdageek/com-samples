@@ -17,6 +17,7 @@ typedef void* gpointer;
 #define S_OK 0
 #define E_FAIL 0x80004005
 #define E_NOTIMPL 0x80004001
+#define E_NOINTERFACE 0x80004002
 
 #define HRESULT int
 
@@ -49,6 +50,11 @@ typedef struct
 	HRESULT (STDCALL *Invoke)(IDispatch *iface, unsigned int dispid, REFIID iid, unsigned int lcid, unsigned short flags, gpointer params, gpointer result, gpointer excepinfo, gpointer err_arg);
 } IDispatchVtbl;
 
+typedef struct IOneVtbl {
+	IUnknownVtbl unk;
+	HRESULT (STDCALL *CommandOne) (void);
+} IOneVtbl;
+
 struct IDispatch
 {
 	const IDispatchVtbl *lpVtbl;
@@ -57,6 +63,10 @@ struct IDispatch
 struct IUnknown {
 	const IUnknownVtbl *vtbl;
 };
+
+typedef struct IOne {
+	const IOneVtbl *vtbl;
+} IOne;
 
 typedef struct ComObject {
 	IUnknown unk;
