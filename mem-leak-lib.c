@@ -34,30 +34,30 @@ marshal_free (void *ptr)
 #define LOG(msg) fprintf(stderr, "%s:%d: %s %s\n", __FILE__, __LINE__, __func__, msg);
 
 static HRESULT STDCALL
-comobject_QueryInterface (IUnknown *pUnk, gpointer riid, gpointer* ppv);
+oneobject_QueryInterface (IUnknown *pUnk, gpointer riid, gpointer* ppv);
 
 static HRESULT STDCALL
-comobject_AddRef (IUnknown *pUnk);
+oneobject_AddRef (IUnknown *pUnk);
 
 static HRESULT STDCALL
-comobject_Release (IUnknown *pUnk);
+oneobject_Release (IUnknown *pUnk);
 
 static HRESULT STDCALL
-comobject_CommandOne (void);
+oneobject_CommandOne (void);
 
-static IOneVtbl comobject_vtable = {
-	&comobject_QueryInterface,
-	&comobject_AddRef,
-	&comobject_Release,
-	&comobject_CommandOne,
+static IOneVtbl oneobject_vtable = {
+	&oneobject_QueryInterface,
+	&oneobject_AddRef,
+	&oneobject_Release,
+	&oneobject_CommandOne,
 };
 
 HRESULT STDCALL
-memleak_create_com_object (ComObject **out)
+memleak_create_one_object (OneObject **out)
 {
 	LOG("enter");
-	ComObject *p = marshal_alloc (sizeof (ComObject));
-	p->unk.vtbl = &comobject_vtable.unk;
+	OneObject *p = marshal_alloc (sizeof (OneObject));
+	p->unk.vtbl = &oneobject_vtable.unk;
 	p->refcount = 1;
 	*out = p;
 	LOG("return");
@@ -65,9 +65,9 @@ memleak_create_com_object (ComObject **out)
 }
 
 static HRESULT STDCALL
-comobject_QueryInterface (IUnknown *pUnk, gpointer riid, gpointer* ppv)
+oneobject_QueryInterface (IUnknown *pUnk, gpointer riid, gpointer* ppv)
 {
-	ComObject *obj = (ComObject*)pUnk;
+	OneObject *obj = (OneObject*)pUnk;
 	LOG ("enter");
 	*ppv = NULL;
 	if (!memcmp(riid, &IID_IUnknown, sizeof(GUID))) {
@@ -95,9 +95,9 @@ comobject_QueryInterface (IUnknown *pUnk, gpointer riid, gpointer* ppv)
 }
 
 static HRESULT STDCALL
-comobject_AddRef (IUnknown *pUnk)
+oneobject_AddRef (IUnknown *pUnk)
 {
-	ComObject *obj = (ComObject*)pUnk;
+	OneObject *obj = (OneObject*)pUnk;
 	LOG ("enter");
 	obj->refcount++;
 	LOG ("return");
@@ -105,9 +105,9 @@ comobject_AddRef (IUnknown *pUnk)
 }
 
 static HRESULT STDCALL
-comobject_Release (IUnknown *pUnk)
+oneobject_Release (IUnknown *pUnk)
 {
-	ComObject *obj = (ComObject*)pUnk;
+	OneObject *obj = (OneObject*)pUnk;
 	LOG ("enter");
 	obj->refcount--;
 	if (obj->refcount == 0) {
@@ -119,7 +119,7 @@ comobject_Release (IUnknown *pUnk)
 }
 
 static HRESULT STDCALL
-comobject_CommandOne (void)
+oneobject_CommandOne (void)
 {
 	LOG ("enter");
 	LOG ("return");

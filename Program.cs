@@ -6,11 +6,11 @@ public static class LeakLib {
     public const string LibName="mem-leak-lib";
 
     [DllImport(LeakLib.LibName)]
-    private static extern int memleak_create_com_object (out IntPtr p);
+    private static extern int memleak_create_one_object (out IntPtr p);
 
     public static IntPtr Create() {
 	IntPtr ptr;
-	int hr = memleak_create_com_object (out ptr);
+	int hr = memleak_create_one_object (out ptr);
 	if (hr != 0) {
 	    throw new Exception ($"returned 0x{hr:x}");
 	}

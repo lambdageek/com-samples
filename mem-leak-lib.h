@@ -68,12 +68,12 @@ typedef struct IOne {
 	const IOneVtbl *vtbl;
 } IOne;
 
-typedef struct ComObject {
+typedef struct OneObject {
 	IUnknown unk;
 	int refcount;
-} ComObject;
+} OneObject;
 
-API_EXPORT HRESULT STDCALL memleak_create_com_object (ComObject **out);
+API_EXPORT HRESULT STDCALL memleak_create_one_object (OneObject **out);
 
 
 #endif
